@@ -29,7 +29,7 @@ if args.sg:
     security_group = create_security_group("RSNA", ec2_client, vpc)
 
 if args.ingress:
-    add_ingress_to_sg(ec2_client, "RSNA", vpc, "0.0.0.0/0", 9090, 9090)
+    add_ingress_to_sg(ec2_client, "RSNA", vpc, "0.0.0.0/0", 8080, 8080)
 
 if args.ec2:
     create_ec2(ec2, settings, security_group, "RSNA")
