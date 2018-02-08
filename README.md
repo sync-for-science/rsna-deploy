@@ -13,8 +13,8 @@ wizard in the console to do this. [Instructions from Amazon.](https://docs.aws.a
 4. With settings file populated you can run the python script to create the infrastructure. Toggle the different steps
 using the command line arguments. You should also be able to run them all at once.
 
-```python
-python create_rsna_infrastructure.py \-\-sg --ingress --ec2
+```shell
+python create_rsna_infrastructure.py --sg --ingress --ec2
 ```
 
 ## Deploying Code
@@ -22,6 +22,6 @@ python create_rsna_infrastructure.py \-\-sg --ingress --ec2
 1. Running the following will use ssm to send commands to the EC2 to install docker anddocker-compose,
 then run the images.
 
-```python
+```shell
 python create_rsna_infrastructure.py --deploy
 ```
