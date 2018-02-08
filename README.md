@@ -14,7 +14,7 @@ wizard in the console to do this. [Instructions from Amazon.](https://docs.aws.a
 using the command line arguments. You should also be able to run them all at once.
 
 ```python
-python create_rsna_infrastructure.py --sg --ingress --ec2
+python create_rsna_infrastructure.py \-\-sg --ingress --ec2
 ```
 
 ## Deploying Code
