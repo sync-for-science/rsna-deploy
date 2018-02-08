@@ -1,0 +1,21 @@
+# System Configuration.
+# This is the profile you use for your AWS CLI (If multiple accounts, otherwise leave as default)
+AWS_CLI_PROFILE_NAME=default
+
+# Not account-centric AWS Configurations.
+# Amazon Linux AMI
+AMI_IMAGE_ID=ami-97785bed
+EC2_INSTANCE_TYPE=m4.large
+AVAILABILITY_ZONE=us-east-1a
+TENANCY=default
+
+# After creating instance role, place the ARN here.
+EC2_IAM_INSTANCE_PROFILE_ARN=
+
+# Fill these in based on where you want the EC2 to live in your AWS Account, and who the owner will be tagged as.
+VPC_ID=
+SUBNET_ID=
+MACHINE_OWNER=
+
+# Name of key pair in Amazon to use.
+EC2_KEY_NAME=
