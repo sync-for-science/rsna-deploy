@@ -17,6 +17,8 @@ def read_settings_file(filename):
     return d
 
 
+
+
 def create_security_group(stack_name, ec2_client, vpc):
 
     print("Creating Security Groups")
@@ -65,6 +67,13 @@ def create_ec2(ec2, settings, security_group, stack_name):
     return new_instance
 
 
+def create_assign_elastic_ip(stack_name, ec2_client):
+    instance_id = get_instance_id(stack_name, ec2_client)
+    allocation = ec2_client.allocate_address(Domain='vpc')
+    ec2_client.associate_address(AllocationId=allocation['AllocationId'],
+                                            InstanceId=instance_id)
+
+
 def add_ingress_to_sg(ec2_client, stack_name, vpc, cidr_ip, from_port, to_port):
 
     security_group = list(vpc.security_groups.filter(Filters=[{'Name': 'tag:Name', 'Values': [stack_name + '_SG']}]))[0]
@@ -85,7 +94,7 @@ def add_ingress_to_sg(ec2_client, stack_name, vpc, cidr_ip, from_port, to_port):
             print("Unexpected error: %s" % e)
 
 
-def send_commands(stack_name, ec2_client, ssm_client, commands):
+def get_instance_id(stack_name, ec2_client):
     filters = [{
         'Name': 'tag:Name',
         'Values': [stack_name]}, {
@@ -95,9 +104,16 @@ def send_commands(stack_name, ec2_client, ssm_client, commands):
 
     ecs_ec2_instance1 = ec2_client.describe_instances(Filters=filters)
 
-    ec2_waiter = ec2_client.get_waiter('instance_status_ok')
-    ec2_waiter.wait(InstanceIds=[ecs_ec2_instance1['Reservations'][0]['Instances'][0]['InstanceId']])
+    return ecs_ec2_instance1['Reservations'][0]['Instances'][0]['InstanceId']
 
-    ssm_client.send_command(InstanceIds=[ecs_ec2_instance1['Reservations'][0]['Instances'][0]['InstanceId']],
+
+def send_commands(stack_name, ec2_client, ssm_client, commands):
+
+    ec2_instance_id = get_instance_id(stack_name, ec2_client)
+
+    ec2_waiter = ec2_client.get_waiter('instance_status_ok')
+    ec2_waiter.wait(InstanceIds=[ec2_instance_id])
+
+    ssm_client.send_command(InstanceIds=[ec2_instance_id],
                             DocumentName="AWS-RunShellScript",
                             Parameters={'commands': commands})

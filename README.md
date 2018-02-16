@@ -17,6 +17,8 @@ using the command line arguments. You should also be able to run them all at onc
 python create_rsna_infrastructure.py --sg --ingress --ec2
 ```
 
+5. You may want to manually assign a tag to the Elastic IP. Couldn't boto3 it in a few minutes.
+
 ## Deploying Code
 
 1. Running the following will use ssm to send commands to the EC2 to install docker anddocker-compose,

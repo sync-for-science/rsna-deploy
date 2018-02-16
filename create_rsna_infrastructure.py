@@ -1,5 +1,10 @@
 import boto3
-from infrastructure import create_ec2, create_security_group, read_settings_file, add_ingress_to_sg, send_commands
+from infrastructure import create_ec2, \
+    create_security_group, \
+    read_settings_file, \
+    add_ingress_to_sg, \
+    send_commands, \
+    create_assign_elastic_ip
 
 import argparse
 
@@ -9,10 +14,14 @@ parser.add_argument("--sg",
     help="Create security groups.", action='store_true')
 parser.add_argument("--ingress",
     help='Add ingress to security groups.', action='store_true')
+parser.add_argument("--elasticip",
+    help='Create Elastic IP.', action='store_true')
 parser.add_argument("--ec2",
     help='Create EC2.', action='store_true')
 parser.add_argument("--deploy",
     help='Install docker, Pull Repo, and compose.', action='store_true')
+parser.add_argument("--loaddata",
+    help='Loads test data into running instances.', action='store_true')
 
 args = parser.parse_args()
 
@@ -25,17 +34,22 @@ ec2_client = boto3.client('ec2')
 vpc = ec2.Vpc(vpc_id)
 ssm_client = boto3.client('ssm')
 
+STACK_NAME = "RSNA"
+
 if args.sg:
-    security_group = create_security_group("RSNA", ec2_client, vpc)
+    security_group = create_security_group(STACK_NAME, ec2_client, vpc)
 
 if args.ingress:
-    add_ingress_to_sg(ec2_client, "RSNA", vpc, "0.0.0.0/0", 8080, 8080)
+    add_ingress_to_sg(ec2_client, STACK_NAME, vpc, "0.0.0.0/0", 8080, 8080)
 
 if args.ec2:
-    create_ec2(ec2, settings, security_group, "RSNA")
+    create_ec2(ec2, settings, security_group, STACK_NAME)
+
+if args.elasticip:
+    create_assign_elastic_ip(STACK_NAME, ec2_client)
 
 if args.deploy:
-    send_commands("RSNA", ec2_client, ssm_client, ["sudo yum update -y && sudo yum install -y git "
+    send_commands(STACK_NAME, ec2_client, ssm_client, ["sudo yum update -y && sudo yum install -y git "
                                                    "&& sudo yum install -y docker "
                                                    "&& sudo service docker restart "
                                                    "&& sudo usermod -a -G docker ec2-user"
@@ -45,8 +59,12 @@ if args.deploy:
                                                    "&& git clone --recursive https://github.com/RSNA/s4s-stack /home/ec2-user/s4s-stack"
                                                    "&& cd /home/ec2-user/s4s-stack"
                                                    "&& git submodule update --init --recursive"
+                                                   "&& docker-compose down"
+                                                   "&& docker volume prune -f"
                                                    "&& docker-compose up -d --force-recreate"])
 
-
+if args.loaddata:
+    send_commands(STACK_NAME, ec2_client, ssm_client, ["cd /home/ec2-user/s4s-stack"
+                                                   "&& docker-compose -f docker-compose.loaddata.yml up"])
 
 
