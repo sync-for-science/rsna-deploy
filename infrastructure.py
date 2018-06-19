@@ -74,9 +74,7 @@ def create_assign_elastic_ip(stack_name, ec2_client):
                                             InstanceId=instance_id)
 
 
-def add_ingress_to_sg(ec2_client, stack_name, vpc, cidr_ip, from_port, to_port):
-
-    security_group = list(vpc.security_groups.filter(Filters=[{'Name': 'tag:Name', 'Values': [stack_name + '_SG']}]))[0]
+def clear_sg_ingresses(ec2_client, stack_name):
 
     client_security_groups = ec2_client.describe_security_groups(Filters=[{'Name': 'tag:Name', 'Values': [stack_name + '_SG']}])
 
@@ -84,6 +82,11 @@ def add_ingress_to_sg(ec2_client, stack_name, vpc, cidr_ip, from_port, to_port):
     if len(client_security_groups['SecurityGroups'][0]['IpPermissions']) > 0:
         for permission in client_security_groups['SecurityGroups'][0]['IpPermissions']:
             ec2_client.revoke_security_group_ingress(GroupId=client_security_groups['SecurityGroups'][0]['GroupId'], IpPermissions=[permission])
+
+
+def add_ingress_to_sg(stack_name, vpc, cidr_ip, from_port, to_port):
+
+    security_group = list(vpc.security_groups.filter(Filters=[{'Name': 'tag:Name', 'Values': [stack_name + '_SG']}]))[0]
 
     try:
         security_group.authorize_ingress(CidrIp=cidr_ip, FromPort=from_port, ToPort=to_port, IpProtocol="tcp")
@@ -116,4 +119,6 @@ def send_commands(stack_name, ec2_client, ssm_client, commands):
 
     ssm_client.send_command(InstanceIds=[ec2_instance_id],
                             DocumentName="AWS-RunShellScript",
-                            Parameters={'commands': commands})
+                            Parameters={'commands': commands},
+                            OutputS3BucketName='rsna-command-logs',
+                            OutputS3KeyPrefix=stack_name)
