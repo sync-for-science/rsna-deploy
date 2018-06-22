@@ -86,12 +86,12 @@ if args.deploy_rsna:
     send_commands(STACK_NAME, ec2_client, ssm_client, ["cd /home/ec2-user/reference-stack-docker/"
                                                         "&& git pull"
                                                         "&& git submodule update --init --recursive"
-                                                        "&& docker-compose -f /home/ec2-user/reference-stack-docker/docker-builds/s4s-stack/docker-compose.yml -f /home/ec2-user/reference-stack-docker/docker-builds/s4s-stack/docker-compose.override.yml -f /home/ec2-user/reference-stack-docker/deploys/imaging.syncfor.science/docker-compose.override.yml down"
+                                                        "&& docker-compose -f /home/ec2-user/reference-stack-docker/docker-builds/reference-imaging/docker-compose.yml -f /home/ec2-user/reference-stack-docker/docker-builds/reference-imaging/docker-compose.override.yml -f /home/ec2-user/reference-stack-docker/deploys/imaging.syncfor.science/docker-compose.override.yml down"
                                                         "&& docker volume prune -f"
-                                                        "&& docker-compose -f  /home/ec2-user/reference-stack-docker/docker-builds/s4s-stack/docker-compose.yml -f /home/ec2-user/reference-stack-docker/docker-builds/s4s-stack/docker-compose.override.yml -f /home/ec2-user/reference-stack-docker/deploys/imaging.syncfor.science/docker-compose.override.yml up  -d --force-recreate"])
+                                                        "&& docker-compose -f  /home/ec2-user/reference-stack-docker/docker-builds/reference-imaging/docker-compose.yml -f /home/ec2-user/reference-stack-docker/docker-builds/reference-imaging/docker-compose.override.yml -f /home/ec2-user/reference-stack-docker/deploys/imaging.syncfor.science/docker-compose.override.yml up  -d --force-recreate"])
 
 if args.loaddata:
     send_commands(STACK_NAME, ec2_client, ssm_client, ["cd /home/ec2-user/reference-stack-docker/"
-                                                   "&& docker-compose -f /home/ec2-user/reference-stack-docker/docker-builds/s4s-stack/docker-compose.loaddata.yml up"])
+                                                   "&& docker-compose -f /home/ec2-user/reference-stack-docker/docker-builds/reference-imaging/docker-compose.loaddata.yml up"])
 
 
