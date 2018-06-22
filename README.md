@@ -25,5 +25,5 @@ python create_rsna_infrastructure.py --sg --ingress --ec2
 then run the images.
 
 ```shell
-python create_rsna_infrastructure.py --deploy
+python create_rsna_infrastructure.py --deploy_rsna
 ```
